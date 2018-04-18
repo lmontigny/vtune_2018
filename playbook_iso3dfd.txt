@@ -1,0 +1,135 @@
+# on XEON frontend
+
+tar zxf iso3dfdlab.tar.gz
+cd iso3dfdlab/
+
+############################ Dev01 ################################
+
+./createnewversion.pl
+./compileversion01.sh
+
+# On NODE
+
+./runversion01.sh
+
+#advixe-cl -help collect
+advixe-cl -collect roofline -project-dir advi01 -search-dir src:r=./src/dev01 -- bin/iso3dfd_dev01_cpu_avx512.exe 128 128 128
+
+#advixe-cl -help report
+#advixe-cl -help snapshot
+advixe-cl -snapshot -project-dir ./advi01 -pack -cache-sources -cache-binaries -- snapshot_advi01
+
+#amplxe-cl -help collect
+amplxe-cl -collect hpc-performance -result-dir ampl01hp -source-search-dir ./src/dev01 -search-dir ./bin -- bin/iso3dfd_dev01_cpu_avx512.exe 128 128 128
+
+amplxe-cl -report summary -result-dir ampl01hp
+
+# on XEON frontend
+
+./compileversion01.sh
+
+# on NODE
+
+cpuinfo
+
+export KMP_AFFINITY=verbose
+./runversion01.sh
+
+export KMP_AFFINITY=verbose,scatter
+./runversion01.sh
+
+export KMP_AFFINITY=verbose,compact
+./runversion01.sh
+
+#amplxe-cl -help collect
+amplxe-cl -collect hpc-performance -result-dir ampl01hp_threaded -source-search-dir ./src/dev01 -search-dir ./bin -- bin/iso3dfd_dev01_cpu_avx512.exe 128 128 128
+
+amplxe-cl -report summary -result-dir ampl01hp_threaded
+
+############################ Dev02 ################################
+
+# on XEON frontend
+
+./createnewversion.pl
+./compileversion02.sh
+
+# on NODE
+
+advixe-cl -collect roofline -project-dir advi02 -search-dir src:r=./src/dev02 -- bin/iso3dfd_dev02_cpu_avx512.exe 128 128 128
+advixe-cl -snapshot -project-dir ./advi02 -pack -cache-sources -cache-binaries -- snapshot_advi02
+
+amplxe-cl -collect hpc-performance -result-dir ampl02hp -source-search-dir ./src/dev02 -search-dir ./bin -- bin/iso3dfd_dev02_cpu_avx512.exe 128 128 128
+amplxe-cl -collect memory-access   -result-dir ampl02ma -source-search-dir ./src/dev02 -search-dir ./bin -- bin/iso3dfd_dev02_cpu_avx512.exe 128 128 128
+
+advixe-cl -collect survey -project-dir advi02_map -search-dir src:r=./src/dev02 -- bin/iso3dfd_dev02_cpu_avx512.exe 64 64 64
+advixe-cl -collect map    -project-dir advi02_map -search-dir src:r=./src/dev02 -mark-up-list=3,4,7,8 -- bin/iso3dfd_dev02_cpu_avx512.exe 64 64 64
+advixe-cl -snapshot -project-dir ./advi02_map -pack -cache-sources -cache-binaries -- snapshot_advi02_map
+
+# on XEON frontend
+
+./compileversion02.sh
+
+# on NODE
+
+./runversion02.sh
+
+############################ Dev03 ################################
+
+# on XEON frontend
+
+./createnewversion.pl
+./compileversion03.sh
+
+# on NODE
+
+advixe-cl -collect roofline -project-dir advi03 -search-dir src:r=./src/dev03 -- bin/iso3dfd_dev03_cpu_avx512.exe 128 128 128
+advixe-cl -snapshot -project-dir ./advi03 -pack -cache-sources -cache-binaries -- snapshot_advi03
+
+amplxe-cl -collect memory-access   -result-dir ampl03ma -source-search-dir ./src/dev03 -search-dir ./bin -- bin/iso3dfd_dev03_cpu_avx512.exe 128 128 128
+
+# on XEON frontend
+
+./compileversion03.sh
+
+# on NODE
+
+./runversion03.sh
+
+############################ Dev04 ################################
+
+# on XEON frontend
+
+./createnewversion.pl
+./compileversion04.sh
+
+# on NODE
+
+advixe-cl -collect roofline -project-dir advi04 -search-dir src:r=./src/dev04 -- bin/iso3dfd_dev04_cpu_avx512.exe 128 128 128
+advixe-cl -snapshot -project-dir ./advi04 -pack -cache-sources -cache-binaries -- snapshot_advi04
+
+# on XEON frontend
+
+./compileversion04.sh
+
+# on NODE
+
+./runversion04.sh
+
+############################ Dev05 ################################
+
+# on XEON frontend
+
+./createnewversion.pl
+./compileversion05.sh
+
+# on NODE
+
+amplxe-cl -collect memory-access -result-dir ampl05ma -source-search-dir ./src/dev05 -search-dir ./bin -- bin/iso3dfd_dev05_cpu_avx512.exe 128 128 128
+
+# on XEON frontend
+
+./compileversion05.sh
+
+# on NODE
+
+./runversion05.sh
